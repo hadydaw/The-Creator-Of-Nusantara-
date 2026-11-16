@@ -7,6 +7,10 @@ var crop: String = ""
 var age: int = 0
 var watered: bool = false
 
+const TEX_GRASS := preload("res://assets/tex/grass_fresh.png")
+const TEX_TILLED := preload("res://assets/tex/soil_tilled.png")
+const TEX_WET := preload("res://assets/tex/soil_wet.png")
+
 var _soil_mat: StandardMaterial3D
 var _plant_mat: StandardMaterial3D
 var _plants: Node3D
@@ -59,10 +63,11 @@ func is_ready() -> bool:
 
 
 func refresh() -> void:
-	var base := Color(0.3, 0.5, 0.25) if state == 0 else Color(0.4, 0.26, 0.16)
-	if watered and state > 0:
-		base = base.darkened(0.35)
-	_soil_mat.albedo_color = base
+	var tex: Texture2D = TEX_GRASS
+	if state > 0:
+		tex = TEX_WET if watered else TEX_TILLED
+	_soil_mat.albedo_texture = tex
+	_soil_mat.albedo_color = Color(0.8, 0.85, 0.8) if state == 0 else Color.WHITE
 	_plants.visible = state == 2
 	if state == 2:
 		var days: int = maxi(1, int(crop_data().get("days", 1)))

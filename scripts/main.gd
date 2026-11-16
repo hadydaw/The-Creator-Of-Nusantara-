@@ -30,6 +30,7 @@ func _ready() -> void:
 	_build_kios()
 	_build_tent()
 	_build_trees()
+	_build_grass()
 
 	player = PlayerScript.new()
 	add_child(player)
@@ -146,7 +147,7 @@ func _build_island() -> void:
 	grass.bottom_radius = 40.0
 	grass.height = 2.0
 	grass.radial_segments = 28
-	_add_mesh(self, grass, _mat(Color(0.36, 0.62, 0.3)), Vector3(0, -1.0, 0))
+	_add_mesh(self, grass, _ground_material(), Vector3(0, -1.0, 0))
 	var cyl := CylinderShape3D.new()
 	cyl.radius = 40.0
 	cyl.height = 2.0
@@ -298,6 +299,100 @@ func _build_trees() -> void:
 		cyl.height = 3.0
 		_add_body(root, cyl, Vector3(0, 1.5, 0), 1)
 		placed += 1
+
+
+# ---------------------------------------------------------------- rumput
+
+func _ground_material() -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = load("res://scripts/ground.gdshader")
+	m.set_shader_parameter("tex_fresh", load("res://assets/tex/grass_fresh.png"))
+	m.set_shader_parameter("tex_dry", load("res://assets/tex/grass_dry.png"))
+	m.set_shader_parameter("tex_dark", load("res://assets/tex/grass_dark.png"))
+	m.set_shader_parameter("tex_path", load("res://assets/tex/soil_dry.png"))
+	return m
+
+
+func _cross_mesh(aspect: float, mat: Material) -> ArrayMesh:
+	var hw := aspect * 0.5
+	var verts := PackedVector3Array([
+		Vector3(-hw, 0, 0), Vector3(hw, 0, 0), Vector3(hw, 1, 0), Vector3(-hw, 1, 0),
+		Vector3(0, 0, -hw), Vector3(0, 0, hw), Vector3(0, 1, hw), Vector3(0, 1, -hw)])
+	var quad_uv := [Vector2(0, 1), Vector2(1, 1), Vector2(1, 0), Vector2(0, 0)]
+	var uvs := PackedVector2Array(quad_uv + quad_uv)
+	var normals := PackedVector3Array()
+	for i in 8:
+		normals.append(Vector3.UP)
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = verts
+	arrays[Mesh.ARRAY_NORMAL] = normals
+	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	arrays[Mesh.ARRAY_INDEX] = PackedInt32Array([0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7])
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	mesh.surface_set_material(0, mat)
+	return mesh
+
+
+func _grass_ok(p: Vector2) -> bool:
+	if absf(p.x) < 6.2 and p.y < -1.8 and p.y > -11.2:
+		return false
+	for h in [Vector2(-11, -2), Vector2(11, -2)]:
+		if p.distance_to(h) < 5.2:
+			return false
+	if p.distance_to(Vector2(8, 9)) < 3.6:
+		return false
+	var segs := [
+		[Vector2(0, 12), Vector2(0, -1.5)],
+		[Vector2(-9, 0.6), Vector2(9, 0.6)],
+		[Vector2(0, 6), Vector2(7, 8.5)],
+	]
+	for sg in segs:
+		var c := Geometry2D.get_closest_point_to_segment(p, sg[0], sg[1])
+		if p.distance_to(c) < 1.8:
+			return false
+	return true
+
+
+func _scatter(tex_path: String, count: int, height: float, min_r: float, rng: RandomNumberGenerator) -> void:
+	var tex: Texture2D = load(tex_path)
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://scripts/grass.gdshader")
+	mat.set_shader_parameter("tex", tex)
+	var aspect := float(tex.get_width()) / float(tex.get_height())
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = _cross_mesh(aspect, mat)
+	var xf: Array = []
+	var tries := 0
+	while xf.size() < count and tries < count * 20:
+		tries += 1
+		var ang := rng.randf() * TAU
+		var rad := sqrt(rng.randf()) * 42.0
+		if rad < min_r:
+			continue
+		var p := Vector2(cos(ang), sin(ang)) * rad
+		if not _grass_ok(p):
+			continue
+		var sc := height * rng.randf_range(0.7, 1.35)
+		var b := Basis.from_euler(Vector3(0, rng.randf() * TAU, 0)).scaled(Vector3(sc, sc, sc))
+		xf.append(Transform3D(b, Vector3(p.x, -0.02, p.y)))
+	mm.instance_count = xf.size()
+	for i in xf.size():
+		mm.set_instance_transform(i, xf[i])
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mmi)
+
+
+func _build_grass() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7731
+	_scatter("res://assets/tex/clump_short.png", 1100, 0.4, 0.0, rng)
+	_scatter("res://assets/tex/clump_tall.png", 380, 1.0, 16.0, rng)
+	_scatter("res://assets/tex/clump_flower.png", 240, 0.75, 8.0, rng)
 
 
 # ---------------------------------------------------------------- siklus
