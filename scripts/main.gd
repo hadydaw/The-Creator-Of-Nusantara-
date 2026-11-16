@@ -505,6 +505,7 @@ func _run_selftest() -> void:
 	hud.set_tool(2)
 	do_action()
 	await get_tree().create_timer(0.4).timeout
+	await _shot(out_dir + "/02b_tanam.png")
 	var s2: bool = plots[0].state == 2 and int(Game.seeds["padi"]) == 2
 	check.call("tanam padi (benih 3 -> 2)", s2)
 	if not s2: fails += 1

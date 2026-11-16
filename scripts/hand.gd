@@ -17,23 +17,44 @@ var _t: float = 0.0
 var _sway: Vector2 = Vector2.ZERO
 var _tw: Tween
 var _tex: TextureRect
+var _poses: Dictionary = {}
+var _pose: String = "open"
 
 
 func _ready() -> void:
 	size = Vector2(W, H)
 	pivot_offset = Vector2(W * 0.5, H)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_poses = {
+		"open": load("res://assets/hand_idle.png"),
+		"grip": load("res://assets/hand_grip.png"),
+		"pinch": load("res://assets/hand_pinch.png"),
+	}
 	_tex = TextureRect.new()
-	_tex.texture = load("res://assets/hand_idle.png")
 	_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_tex.stretch_mode = TextureRect.STRETCH_SCALE
-	_tex.size = Vector2(W, H)
 	_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_tex)
+	_show_pose(_pose_for_tool())
+
+
+func _pose_for_tool() -> String:
+	return "pinch" if tool_id == 2 else "grip"
+
+
+func _show_pose(name: String) -> void:
+	_pose = name
+	var t: Texture2D = _poses[name]
+	_tex.texture = t
+	var w := H * float(t.get_width()) / float(t.get_height())
+	_tex.size = Vector2(w, H)
+	_tex.position = Vector2((W - w) * 0.5, 0.0)
 
 
 func set_tool(i: int) -> void:
 	tool_id = i
+	if _tex:
+		_show_pose(_pose_for_tool())
 	queue_redraw()
 
 
@@ -77,8 +98,10 @@ func play(kind: String) -> void:
 			_tween_to(0.38, Vector2(-24, -36), 1.04, 0.12, Tween.EASE_IN)
 			_tween_to(0.0, Vector2(0, 8), 1.0, 0.3)
 		"reach":
+			_show_pose("open")
 			_tween_to(-0.05, Vector2(0, -36), 1.13, 0.12)
 			_tween_to(0.0, Vector2.ZERO, 1.0, 0.2)
+			_tw.tween_callback(func() -> void: _show_pose(_pose_for_tool()))
 		"bite":
 			for i in 3:
 				_tween_to(0.08, Vector2(0, 10), 1.0, 0.05)
@@ -96,23 +119,22 @@ func _draw() -> void:
 	# Alat digambar di belakang tangan (jari menutupi gagang).
 	var wood := Color(0.47, 0.31, 0.16)
 	var steel := Color(0.62, 0.65, 0.68)
+	var cx := W * 0.5
 	match tool_id:
 		0:
-			draw_line(Vector2(W * 0.6, H * 0.62), Vector2(W * 0.3, -H * 0.2), wood, 9.0)
+			draw_line(Vector2(cx, H * 0.5), Vector2(cx - 8, -H * 0.38), wood, 10.0)
 			draw_colored_polygon(PackedVector2Array([
-				Vector2(W * 0.02, -H * 0.2), Vector2(W * 0.3, -H * 0.3),
-				Vector2(W * 0.36, -H * 0.22), Vector2(W * 0.1, -H * 0.1)]), steel)
+				Vector2(cx - 64, -H * 0.4), Vector2(cx - 4, -H * 0.46),
+				Vector2(cx + 2, -H * 0.36), Vector2(cx - 56, -H * 0.28)]), steel)
 		1:
 			var c := Color(0.35, 0.55, 0.75)
 			draw_colored_polygon(PackedVector2Array([
-				Vector2(W * 0.18, H * 0.1), Vector2(W * 0.78, H * 0.1),
-				Vector2(W * 0.68, H * 0.42), Vector2(W * 0.28, H * 0.42)]), c)
-			draw_arc(Vector2(W * 0.48, H * 0.1), W * 0.26, PI, TAU, 16, Color(0.25, 0.25, 0.28), 4.0)
+				Vector2(cx - 58, -H * 0.3), Vector2(cx + 58, -H * 0.3),
+				Vector2(cx + 44, H * 0.04), Vector2(cx - 44, H * 0.04)]), c)
+			draw_arc(Vector2(cx, -H * 0.3), 58.0, PI, TAU, 16, Color(0.25, 0.25, 0.28), 4.0)
 		2:
-			draw_colored_polygon(PackedVector2Array([
-				Vector2(W * 0.2, H * 0.12), Vector2(W * 0.75, H * 0.12),
-				Vector2(W * 0.85, H * 0.45), Vector2(W * 0.1, H * 0.45)]), Color(0.75, 0.6, 0.38))
-			draw_line(Vector2(W * 0.2, H * 0.12), Vector2(W * 0.75, H * 0.12), Color(0.5, 0.36, 0.2), 6.0)
+			for off in [Vector2(-34, -6), Vector2(-26, -12), Vector2(-40, -14)]:
+				draw_circle(Vector2(cx, 0) + off, 4.0, Color(0.78, 0.62, 0.3))
 		3:
-			draw_line(Vector2(W * 0.55, H * 0.7), Vector2(W * 1.05, -H * 0.55), wood, 6.0)
-			draw_line(Vector2(W * 1.05, -H * 0.55), Vector2(W * 1.0, -H * 0.2), Color(0.9, 0.9, 0.9, 0.8), 1.5)
+			draw_line(Vector2(cx, H * 0.5), Vector2(cx + 150, -H * 0.62), wood, 6.0)
+			draw_line(Vector2(cx + 150, -H * 0.62), Vector2(cx + 146, -H * 0.25), Color(0.9, 0.9, 0.9, 0.8), 1.5)
