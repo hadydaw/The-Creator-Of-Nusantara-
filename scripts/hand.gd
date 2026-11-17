@@ -32,6 +32,12 @@ func _ready() -> void:
 		"pinch": load("res://assets/hand_jepit.png"),
 		"palm": load("res://assets/hand_telapak.png"),
 		"reach": load("res://assets/hand_jangkau.png"),
+		"hoe1": load("res://assets/alat_cangkul_1.png"),
+		"hoe2": load("res://assets/alat_cangkul_2.png"),
+		"hoe3": load("res://assets/alat_cangkul_3.png"),
+		"hoe4": load("res://assets/alat_cangkul_4.png"),
+		"hoe5": load("res://assets/alat_cangkul_5.png"),
+		"hoe6": load("res://assets/alat_cangkul_6.png"),
 	}
 	_tex = TextureRect.new()
 	_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -49,16 +55,18 @@ func _pose_for_tool() -> String:
 			return "pinch"
 		3:
 			return "loose"
-	return "grip"
+	return "hoe1"
 
 
 func _show_pose(name: String) -> void:
 	_pose = name
 	var t: Texture2D = _poses[name]
 	_tex.texture = t
-	var w := H * float(t.get_width()) / float(t.get_height())
-	_tex.size = Vector2(w, H)
-	_tex.position = Vector2((W - w) * 0.5, 0.0)
+	var k := H / 900.0  # semua gambar tangan memakai skala piksel yang sama
+	var w := float(t.get_width()) * k
+	var h := float(t.get_height()) * k
+	_tex.size = Vector2(w, h)
+	_tex.position = Vector2((W - w) * 0.5, H - h)
 
 
 func set_tool(i: int) -> void:
@@ -91,6 +99,12 @@ func play(kind: String) -> void:
 	_tw = create_tween()
 	match kind:
 		"swing":
+			if tool_id == 0:
+				for fr in [["hoe2", 0.09], ["hoe3", 0.11], ["hoe4", 0.06], ["hoe5", 0.16], ["hoe6", 0.12]]:
+					_tw.tween_callback(_show_pose.bind(fr[0]))
+					_tw.tween_interval(fr[1])
+				_tw.tween_callback(func() -> void: _show_pose(_pose_for_tool()))
+				return
 			_tween_to(-0.35, Vector2(14, -30), 1.0, 0.16)
 			_tween_to(0.42, Vector2(-14, 46), 1.05, 0.09, Tween.EASE_IN)
 			_tween_to(0.0, Vector2.ZERO, 1.0, 0.26)
