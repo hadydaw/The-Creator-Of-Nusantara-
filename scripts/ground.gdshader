@@ -1,10 +1,10 @@
 shader_type spatial;
 // Tanah pulau: 3 jenis rumput (segar, kering dekat pantai, gelap dekat hutan) + jalan tanah.
 
-uniform sampler2D tex_fresh : source_color, filter_linear_mipmap, repeat_enable;
-uniform sampler2D tex_dry : source_color, filter_linear_mipmap, repeat_enable;
-uniform sampler2D tex_dark : source_color, filter_linear_mipmap, repeat_enable;
-uniform sampler2D tex_path : source_color, filter_linear_mipmap, repeat_enable;
+uniform sampler2D tex_fresh : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D tex_dry : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D tex_dark : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D tex_path : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform float tile_size = 3.2;
 
 varying vec3 wpos;

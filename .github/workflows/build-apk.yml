@@ -51,6 +51,8 @@ jobs:
           mkdir -p build
           godot --headless --export-debug "Android" build/PulauKabut.apk
           ls -la build
+          (unzip -p build/PulauKabut.apk AndroidManifest.xml | strings | grep -i -E "orient|landscape" || true)
+          (command -v aapt >/dev/null && aapt dump xmltree build/PulauKabut.apk AndroidManifest.xml | grep -i orient || true)
 
       - uses: actions/upload-artifact@v4
         with:

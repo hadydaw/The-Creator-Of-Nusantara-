@@ -14,6 +14,8 @@ const TEX_WET := preload("res://assets/tex/soil_wet.png")
 var _soil_mat: StandardMaterial3D
 var _plant_mat: StandardMaterial3D
 var _plants: Node3D
+var _soil: MeshInstance3D
+var _pegs: Node3D
 
 
 func setup() -> void:
@@ -35,6 +37,23 @@ func setup() -> void:
 	soil.material_override = _soil_mat
 	soil.position.y = 0.05
 	add_child(soil)
+	_soil = soil
+
+	# Petak kosong: hanya patok sudut, tanpa kotak gelap di atas rumput.
+	_pegs = Node3D.new()
+	add_child(_pegs)
+	var peg_mat := StandardMaterial3D.new()
+	peg_mat.albedo_color = Color(0.45, 0.32, 0.2)
+	peg_mat.roughness = 1.0
+	for cx in [-0.9, 0.9]:
+		for cz in [-0.9, 0.9]:
+			var pg := MeshInstance3D.new()
+			var pm := BoxMesh.new()
+			pm.size = Vector3(0.1, 0.3, 0.1)
+			pg.mesh = pm
+			pg.material_override = peg_mat
+			pg.position = Vector3(cx, 0.12, cz)
+			_pegs.add_child(pg)
 
 	_plant_mat = StandardMaterial3D.new()
 	_plant_mat.roughness = 0.9
@@ -68,6 +87,8 @@ func refresh() -> void:
 		tex = TEX_WET if watered else TEX_TILLED
 	_soil_mat.albedo_texture = tex
 	_soil_mat.albedo_color = Color(0.8, 0.85, 0.8) if state == 0 else Color.WHITE
+	_soil.visible = state > 0
+	_pegs.visible = state == 0
 	_plants.visible = state == 2
 	if state == 2:
 		var days: int = maxi(1, int(crop_data().get("days", 1)))
