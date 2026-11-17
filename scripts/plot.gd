@@ -14,6 +14,8 @@ const TEX_WET := preload("res://assets/tex/soil_wet.png")
 var _soil_mat: StandardMaterial3D
 var _plant_mat: StandardMaterial3D
 var _plants: Node3D
+var _sprite: Sprite3D
+var _spr_tex := {}
 var _soil: MeshInstance3D
 var _pegs: Node3D
 
@@ -70,7 +72,22 @@ func setup() -> void:
 		m.material_override = _plant_mat
 		m.position = Vector3(off.x, 0.1, off.y)
 		_plants.add_child(m)
+
+	_sprite = Sprite3D.new()
+	_sprite.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+	_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_OPAQUE_PREPASS
+	_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	_sprite.pixel_size = 0.0034
+	_sprite.double_sided = true
+	add_child(_sprite)
 	refresh()
+
+
+func _sprite_tex(name: String, stage: String) -> Texture2D:
+	var key := name + "_" + stage
+	if not _spr_tex.has(key):
+		_spr_tex[key] = load("res://assets/spr/%s.png" % key)
+	return _spr_tex[key]
 
 
 func crop_data() -> Dictionary:
@@ -89,8 +106,18 @@ func refresh() -> void:
 	_soil_mat.albedo_color = Color(0.8, 0.85, 0.8) if state == 0 else Color.WHITE
 	_soil.visible = state > 0
 	_pegs.visible = state == 0
-	_plants.visible = state == 2
-	if state == 2:
+	var spr_name: String = str(crop_data().get("sprite", ""))
+	var use_sprite: bool = state == 2 and spr_name != ""
+	_sprite.visible = use_sprite
+	_plants.visible = state == 2 and not use_sprite
+	if use_sprite:
+		var d: int = maxi(1, int(crop_data().get("days", 1)))
+		var st: float = clampf(float(age) / float(d), 0.0, 1.0)
+		var stage := "tunas" if st < 0.5 else ("dewasa" if st < 1.0 else "buah")
+		var t := _sprite_tex(spr_name, stage)
+		_sprite.texture = t
+		_sprite.position = Vector3(0, 0.1 + t.get_height() * _sprite.pixel_size * 0.5, 0)
+	if state == 2 and not use_sprite:
 		var days: int = maxi(1, int(crop_data().get("days", 1)))
 		var stage: float = clampf(float(age) / float(days), 0.0, 1.0)
 		var h: float = lerpf(0.25, 1.0, stage)

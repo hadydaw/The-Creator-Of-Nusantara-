@@ -292,8 +292,16 @@ func _build_trees() -> void:
 		root.position = Vector3(pos.x, 0, pos.y)
 		root.scale = Vector3(s, s, s)
 		add_child(root)
-		_add_mesh(root, trunk_mesh, trunk_mat, Vector3(0, 1.5, 0))
-		_add_mesh(root, leaf_mesh, leaf_mats[placed % 3], Vector3(0, 3.7, 0))
+		var sp := Sprite3D.new()
+		var tname: String = "kelapa_dewasa" if placed % 3 != 2 else "pisang_dewasa"
+		sp.texture = load("res://assets/spr/%s.png" % tname)
+		sp.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+		sp.alpha_cut = SpriteBase3D.ALPHA_CUT_OPAQUE_PREPASS
+		sp.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		sp.double_sided = true
+		sp.pixel_size = 0.0085
+		sp.position = Vector3(0, sp.texture.get_height() * sp.pixel_size * 0.5 - 0.1, 0)
+		root.add_child(sp)
 		var cyl := CylinderShape3D.new()
 		cyl.radius = 0.35
 		cyl.height = 3.0

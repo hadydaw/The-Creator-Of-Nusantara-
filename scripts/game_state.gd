@@ -12,6 +12,8 @@ const CROPS := {
 	"jagung": {"name": "Jagung", "days": 3, "sell": 11, "seed": 3, "color": Color(0.96, 0.78, 0.15)},
 	"cabai": {"name": "Cabai", "days": 2, "sell": 8, "seed": 2, "color": Color(0.85, 0.12, 0.1)},
 	"singkong": {"name": "Singkong", "days": 5, "sell": 20, "seed": 6, "color": Color(0.62, 0.45, 0.3)},
+	"pisang": {"name": "Pisang", "days": 6, "sell": 28, "seed": 8, "color": Color(0.9, 0.8, 0.2), "sprite": "pisang"},
+	"kelapa": {"name": "Kelapa", "days": 8, "sell": 38, "seed": 11, "color": Color(0.6, 0.45, 0.2), "sprite": "kelapa"},
 }
 const FISH := {
 	"teri": {"name": "Ikan Teri", "sell": 6},
@@ -24,7 +26,7 @@ var coins: int = 30
 var day: int = 1
 var clock: float = 6.5
 var fog: float = 1.0
-var seeds: Dictionary = {"padi": 3, "jagung": 3, "cabai": 3, "singkong": 0}
+var seeds: Dictionary = {"padi": 3, "jagung": 3, "cabai": 3, "singkong": 0, "pisang": 0, "kelapa": 0}
 var produce: Dictionary = {}
 var selected_seed: String = "padi"
 var tool_index: int = 0
