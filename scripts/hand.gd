@@ -65,7 +65,6 @@ func set_tool(i: int) -> void:
 	tool_id = i
 	if _tex:
 		_show_pose(_pose_for_tool())
-	queue_redraw()
 
 
 func _process(delta: float) -> void:
@@ -123,28 +122,3 @@ func play(kind: String) -> void:
 			_tween_to(0.0, Vector2.ZERO, 1.0, 0.2)
 		_:
 			_tween_to(0.0, Vector2.ZERO, 1.0, 0.1)
-
-
-func _draw() -> void:
-	# Alat digambar di belakang tangan (jari menutupi gagang).
-	var wood := Color(0.47, 0.31, 0.16)
-	var steel := Color(0.62, 0.65, 0.68)
-	var cx := W * 0.5
-	match tool_id:
-		0:
-			draw_line(Vector2(cx, H * 0.5), Vector2(cx - 8, -H * 0.38), wood, 10.0)
-			draw_colored_polygon(PackedVector2Array([
-				Vector2(cx - 64, -H * 0.4), Vector2(cx - 4, -H * 0.46),
-				Vector2(cx + 2, -H * 0.36), Vector2(cx - 56, -H * 0.28)]), steel)
-		1:
-			var c := Color(0.35, 0.55, 0.75)
-			draw_colored_polygon(PackedVector2Array([
-				Vector2(cx - 58, -H * 0.3), Vector2(cx + 58, -H * 0.3),
-				Vector2(cx + 44, H * 0.04), Vector2(cx - 44, H * 0.04)]), c)
-			draw_arc(Vector2(cx, -H * 0.3), 58.0, PI, TAU, 16, Color(0.25, 0.25, 0.28), 4.0)
-		2:
-			for off in [Vector2(-34, -6), Vector2(-26, -12), Vector2(-40, -14)]:
-				draw_circle(Vector2(cx, 0) + off, 4.0, Color(0.78, 0.62, 0.3))
-		3:
-			draw_line(Vector2(cx, H * 0.5), Vector2(cx + 150, -H * 0.62), wood, 6.0)
-			draw_line(Vector2(cx + 150, -H * 0.62), Vector2(cx + 146, -H * 0.25), Color(0.9, 0.9, 0.9, 0.8), 1.5)
