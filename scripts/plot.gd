@@ -149,7 +149,7 @@ func hint(tool: int) -> String:
 		_:
 			if watered:
 				return "%s (sudah disiram, tumbuh %d/%d)" % [crop_data().get("name", ""), age, int(crop_data().get("days", 0))]
-			return "Siram %s (pakai Ember)" % crop_data().get("name", "")
+			return "Siram %s (pakai Gembor)" % crop_data().get("name", "")
 
 
 ## Mengembalikan {"ok": bool, "msg": String}.

@@ -20,7 +20,7 @@ const FISH := {
 	"gabus": {"name": "Ikan Gabus", "sell": 15},
 	"kakap": {"name": "Ikan Kakap", "sell": 40},
 }
-const TOOLS := ["Cangkul", "Ember", "Benih", "Pancing"]
+const TOOLS := ["Cangkul", "Gembor", "Benih", "Pancing"]
 
 var coins: int = 30
 var day: int = 1

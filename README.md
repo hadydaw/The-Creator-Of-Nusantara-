@@ -10,7 +10,7 @@ APK terbaru ada di tab **Releases**. Pasang di Android (izinkan instalasi dari s
 ## Kontrol
 - Joystick (sentuh sisi kiri): jalan
 - Geser sisi kanan: melihat
-- Tombol Cangkul / Ember / Benih / Pancing: pilih alat
+- Tombol Cangkul / Gembor / Benih / Pancing: pilih alat
 - AKSI: gunakan alat pada yang diarahkan kursor
 
 Di PC: WASD jalan, panah melihat, E aksi.

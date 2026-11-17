@@ -38,6 +38,12 @@ func _ready() -> void:
 		"hoe4": load("res://assets/alat_cangkul_4.png"),
 		"hoe5": load("res://assets/alat_cangkul_5.png"),
 		"hoe6": load("res://assets/alat_cangkul_6.png"),
+		"can1": load("res://assets/alat_gembor_1.png"),
+		"can2": load("res://assets/alat_gembor_2.png"),
+		"can3": load("res://assets/alat_gembor_3.png"),
+		"can4": load("res://assets/alat_gembor_4.png"),
+		"can5": load("res://assets/alat_gembor_5.png"),
+		"can6": load("res://assets/alat_gembor_6.png"),
 	}
 	_tex = TextureRect.new()
 	_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -50,7 +56,7 @@ func _ready() -> void:
 func _pose_for_tool() -> String:
 	match tool_id:
 		1:
-			return "loose"
+			return "can1"
 		2:
 			return "pinch"
 		3:
@@ -66,7 +72,8 @@ func _show_pose(name: String) -> void:
 	var w := float(t.get_width()) * k
 	var h := float(t.get_height()) * k
 	_tex.size = Vector2(w, h)
-	_tex.position = Vector2((W - w) * 0.5, H - h)
+	var nudge := Vector2(-40, -70) if name.begins_with("can") else Vector2.ZERO
+	_tex.position = Vector2((W - w) * 0.5, H - h) + nudge
 
 
 func set_tool(i: int) -> void:
@@ -109,6 +116,12 @@ func play(kind: String) -> void:
 			_tween_to(0.42, Vector2(-14, 46), 1.05, 0.09, Tween.EASE_IN)
 			_tween_to(0.0, Vector2.ZERO, 1.0, 0.26)
 		"water":
+			for fr in [["can2", 0.12], ["can3", 0.14], ["can4", 0.3], ["can5", 0.34], ["can6", 0.16]]:
+				_tw.tween_callback(_show_pose.bind(fr[0]))
+				_tw.tween_interval(fr[1])
+			_tw.tween_callback(func() -> void: _show_pose(_pose_for_tool()))
+			return
+		"water_old":
 			_tween_to(0.62, Vector2(-34, 4), 1.0, 0.2)
 			_tw.tween_interval(0.35)
 			_tween_to(0.0, Vector2.ZERO, 1.0, 0.22)
