@@ -38,6 +38,7 @@ func _ready() -> void:
 
 	hand = HandScript.new()
 	_root.add_child(hand)
+	hand.visible = false  # tangan POV dicopot sementara, menunggu gambar baru
 
 	var cross := Panel.new()
 	cross.mouse_filter = Control.MOUSE_FILTER_IGNORE
