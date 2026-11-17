@@ -26,9 +26,12 @@ func _ready() -> void:
 	pivot_offset = Vector2(W * 0.5, H)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_poses = {
-		"open": load("res://assets/hand_idle.png"),
-		"grip": load("res://assets/hand_grip.png"),
-		"pinch": load("res://assets/hand_pinch.png"),
+		"open": load("res://assets/hand_buka.png"),
+		"loose": load("res://assets/hand_longgar.png"),
+		"grip": load("res://assets/hand_genggam.png"),
+		"pinch": load("res://assets/hand_jepit.png"),
+		"palm": load("res://assets/hand_telapak.png"),
+		"reach": load("res://assets/hand_jangkau.png"),
 	}
 	_tex = TextureRect.new()
 	_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -39,7 +42,14 @@ func _ready() -> void:
 
 
 func _pose_for_tool() -> String:
-	return "pinch" if tool_id == 2 else "grip"
+	match tool_id:
+		1:
+			return "loose"
+		2:
+			return "pinch"
+		3:
+			return "loose"
+	return "grip"
 
 
 func _show_pose(name: String) -> void:
@@ -98,7 +108,7 @@ func play(kind: String) -> void:
 			_tween_to(0.38, Vector2(-24, -36), 1.04, 0.12, Tween.EASE_IN)
 			_tween_to(0.0, Vector2(0, 8), 1.0, 0.3)
 		"reach":
-			_show_pose("open")
+			_show_pose("reach")
 			_tween_to(-0.05, Vector2(0, -36), 1.13, 0.12)
 			_tween_to(0.0, Vector2.ZERO, 1.0, 0.2)
 			_tw.tween_callback(func() -> void: _show_pose(_pose_for_tool()))

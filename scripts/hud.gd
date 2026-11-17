@@ -38,7 +38,6 @@ func _ready() -> void:
 
 	hand = HandScript.new()
 	_root.add_child(hand)
-	hand.visible = false  # tangan POV dicopot sementara, menunggu gambar baru
 
 	var cross := Panel.new()
 	cross.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -152,7 +151,7 @@ func _layout() -> void:
 	(_buttons["seed"] as Panel).position = Vector2(w * 0.5 - 75, h - 104)
 	(_buttons["action"] as Panel).position = Vector2(w - 330, h - 150)
 	(_buttons["save"] as Panel).position = Vector2(w - 98, 10)
-	hand.base_pos = Vector2(w - 235, h - hand.H + 110)
+	hand.base_pos = Vector2(w - 330, h - hand.H + 45)
 	hand.position = hand.base_pos
 
 
